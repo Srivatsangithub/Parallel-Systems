@@ -26,5 +26,7 @@ _______________________________________________________________________
 The average round-trip time (RTT) as a function of message size is computed and plotted along with the standard deviation (std. dev) as error bars. The program calculates the point-to-point message latency for four different pairs of nodes (pair, 2 pairs, 3 pairs, 4 pairs) for the following message sizes: 32KB, 64KB, 128KB, 256KB, 512KB, 1MB, and 2MB between Process 0 and Process 1.
 
 _______________________________________________________________________
-#### 8. 
+#### 8. Computing Derivatives in a Parallel Scheme- MPI
+Implemented the computation of the derivative of a function (sinx() in this case) in a parallel manner using MPI, data decomposition and finite difference method. Boundary conditions have been communicated using blocking point-to-point communication and non-blocking point-to-point communication.
+
 

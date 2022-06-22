@@ -20,3 +20,11 @@ Implemented the calculation of TFICF for each word in a corpus of documents usin
 _______________________________________________________________________
 #### 6. CUDA Programming
 Computed the integral of a given function (cos() here) by calculating the cumulative area under the curve in a parallel scheme using CUDA programming.
+
+_______________________________________________________________________
+#### 7. Point-to-Point Message Latency for Pairs of Nodes
+The average round-trip time (RTT) as a function of message size is computed and plotted along with the standard deviation (std. dev) as error bars. The program calculates the point-to-point message latency for four different pairs of nodes (pair, 2 pairs, 3 pairs, 4 pairs) for the following message sizes: 32KB, 64KB, 128KB, 256KB, 512KB, 1MB, and 2MB between Process 0 and Process 1.
+
+_______________________________________________________________________
+#### 8. 
+

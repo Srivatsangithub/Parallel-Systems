@@ -16,7 +16,7 @@ Computed the TFICF value of each word in the corpus of documents provided using 
 
 _______________________________________________________________________
 #### 5. TFICF-MapReduce Implementation
-
+Implemented the calculation of TFICF for each word in a corpus of documents using MapReduce. The TFICF calculation has been accomplished via three jobs (Word Count, Document Size and TFICF calculation) where each job has its respective Mapper and Reducer classes.
 _______________________________________________________________________
 #### 6. CUDA Programming
 Computed the integral of a given function (cos() here) by calculating the cumulative area under the curve in a parallel scheme using CUDA programming.

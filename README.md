@@ -1,10 +1,10 @@
 # Parallel-Systems
 ### Projects part of Parallel Systems coursework- NC State (Spring 2022)
 
-* Twitter Sentiment Analytics
+* Distributed Training with TensorFlow and Keras
 
       Basic Sentiment Analysis of real-time tweets using Apache Spark, Apache Kafka, Python
-* Bitcoin Price Variation Prediction using Bayesian Regression
+* Distributed Testing with PyTorch
 
       Predicting price variations of Bitcoin using Bayesion Regression(Machine Learning Technique), implemented in Python
 * AdWords Placement Problem via Online Bipartite Graph Matching

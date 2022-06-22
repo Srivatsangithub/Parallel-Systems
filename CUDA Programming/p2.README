@@ -1,0 +1,30 @@
+# Single Author info:
+# srames22 Srivatsan Ramesh
+
+Given:
+------
+Learn how to compile and execute a CUDA program by computing the integral of a given function (cos() here) by calculating the cumulative area under the curve in parallel.  
+
+CUDA Implementation:
+-------------------- 
+1. Declare host(CPU) and device(GPU) buffers that are to be used to compute integral values.
+
+2. Allocate memory to the device buffers: d_xc, d_yc, d_inf, and d_area using cudaMalloc() and host buffers using malloc()
+
+3. In order to perform a deep copy of the xc host buffer to d_xc and make computations easier, a new buffer new_xc of size NGRID is declared and contains values of xc except the first element (index 0)
+
+4. Using cudaMemcpy(), host values of xc are copied to device buffer d_xc.
+
+5. The max number of threads for each block are set to 512 to increase efficiency and the blocks are dynamically calculated based on the thread.
+
+6. Using the kernel configuration, the kernel function is called with device variables and NGRID as parameters.
+
+7. Within the kernel function, each thread is uniquely identified, and each of these threads work on a particular element to compute the cosine value for the same. (thus resulting in faster execution time when compared to the serial code)
+
+8. __syncthreads() is being used throughout the kernel function call in order to avoid any race conditions.
+
+9. The area accumulation formula is applied on the y array that contains the value of the elements with cos function applied to it.
+
+10. A copy of this d_area array is being created in order to assist in computing the cumulative sum, which results in the final integral values.
+
+11. These values are then written into a file, which is used to plot the cosine function and its integral as a graph.

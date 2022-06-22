@@ -18,3 +18,5 @@ _______________________________________________________________________
 #### 5. TFICF-MapReduce Implementation
 
 _______________________________________________________________________
+#### 6. CUDA Programming
+Computed the integral of a given function (cos() here) by calculating the cumulative area under the curve in a parallel scheme using CUDA programming.

@@ -1,0 +1,17 @@
+Single Author info:
+srames22 Srivatsan Ramesh
+
+Explanation of Plot (p1.png):
+----------------------------------
+The average round-trip time (RTT) as a function of message size has been plotted in p1.png, along with the standard deviation (std. dev) as error bars. The p1.png file submitted is a plot created from the data collected while running p1.c, which is a program that calculates the point-to-point message latency for four different pairs of nodes for the following message sizes: 32KB, 64KB, 128KB, 256KB, 512KB, 1MB, and 2MB. The submitted p1.c program has been coded to compute the point-to-point message latency between Process 0 and Process 1.
+
+In the plot, the message size (in KB) is plotted on the x-axis, and the average round trip time (in microseconds) is plotted on the y-axis. The program p1.c has also been used to test message latency for the above message sizes in four different circumstances, as elaborated below. The accompanying legend, which is also featured in the image, can be used to analyze the plot:
+
+Scenario 1: A pair of nodes communicates with one another, i.e. message passing occurs between two nodes. The blue color bar represents this.
+Scenario 2: Two pairs of nodes communicate in parallel, resulting in message transmission across four nodes at the same time. The orange color bar represents this.
+Scenario 3: Three pairs of nodes interact in parallel, resulting in six nodes receiving messages at the same time. The green color bar illustrates this.
+Scenario 4: Four pairs of nodes communicate in parallel, resulting in message transmission across eight nodes at the same time. The red color bar represents this.
+
+Analysis:
+--------
+When examining the plot in terms of latency, it can be seen that, while there is little difference, the average round trip time between different scenarios for any given message size is not significant/major. The minute changes in the average RTT that are detected as the number of node pairs increases could be due to processor having to wait for shared resources and/or delays in message passing between the nodes in the underlying network setup. The average round trip time for point-to-point communication between the pair of nodes i.e Process 0 and Process 1 increases with message size. When compared to the highest message size, which is 2MB, the average RTT for 32KB messages is substantially lower.

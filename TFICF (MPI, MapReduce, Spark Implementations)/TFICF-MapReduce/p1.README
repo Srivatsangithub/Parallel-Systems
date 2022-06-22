@@ -1,0 +1,89 @@
+Single Author info:
+srames22 Srivatsan Ramesh
+
+Goal: To write a program that computes a TF-ICF value for each word in a corpus of documents using MapReduce.
+
+Explanation of Implementation of the TF-ICF Algorithm
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This algorithm requires 3 sets of mappers and reducers to run i.e 3 jobs to run to produce the final output that is, the tficf value for each word@document_name.txt. 2 sets of outputs are recieved for the 2 folders (sets of input textfiles) given as input with each output folder containing WordCounts, DocSize, and TFICF values.
+
+1. WCMapper:
+~~~~~~~~~~~~
+The goal of this job (job_wc in my implementation) is to create a (key,value) pair for every word alongside its document name in which it occrs with the occurance- 1 and compute the total occurance using the mapper and the reducer respectively.
+
+i. I declared MapReduce flavour of datatypes for the value 1 as 'one' and the word@document key that must be the output key as a Text interface. 
+
+ii. The line and the document name from which each line comes into the mapper are obtained. 
+
+iii. The pattern object of Pattern class and the Mapper object of the Matcher class along with the compile() and matcher() methods were used to create a regex pattern that matches with the line that comes in and the group() method of the matcher class is used to split each legal word from the sentence. Additional checks are made for special characters such as [.,()?] etc. to match the sample output as close as possible and to obtain legal words. A condition to ensure that the words does not begin with numbers or escape sequences have also been written to ensure that only legal word are considered. 
+iv. Finally, the 'word' which contains the key and its value in 'one'(which is 1) are written using the context object as the context object will enable interaction for the reducer the retrieve the key, value pairs from the mapper. The crux of logic lies in this part of the code.
+
+2. WCReducer:
+~~~~~~~~~~~~~
+The goal of this reducer was to count the number of occurences of each key.
+i. Since the input had all the key's with 1 as the value against it, the reudcer ran a loop for all the values for each key and summed the values for it to obtain the number of occurances of each word in a partcular document. 
+
+ii. This output i.e word@document, wordCount was written using the context object for the next job to use the same as the input.
+
+iii. Before the next job was initialized 'job_wc.waitForCompletion(true);' will was given to ensure no errors occur before the completion of this job.
+
+3. DSMapper:
+~~~~~~~~~~~~
+The goal of this job (job_ds in my implementation) was to find the docSize of each document and send the next job the output (document, (word=wordCount))
+i. For every input (key, value) pair that occurred, the input is in the form of a Text and hence has to be convered to a string using the toString() method. (Stored in 'input_from_prev_job')
+
+ii. This "word@document" is split using the java string spilt() method and the document name is extracted and set to a Text variable to be written using the context object for the reducer to combiner the values for each key. (split on '@' looks like: ["word", "document"])
+
+iii. To obatin the "word=wordCount" part the "=" is appended to the input Text that was initially converted to string and split based on '\t'. (Looks like this: ["word@document" , "wordCount"]) 
+
+iv. Finally, the output is given to the reducer in the required form using the context object.
+
+4. DSReducer:
+~~~~~~~~~~~~~   
+The goal of the reducer is to send each word along with its document name with the wordCount of that word divided by its docSize.
+
+i. For each document, the reducer recieves a list of (word=WordCount) values. To obtain the docSize, the sum of all the wordCounts for each word is being computed as sum of all occurences of all the words in a document = docSize. The input value for each document is split based on "=" after after converting to string and using the Java Integer.parseInt() method the sum is found for each document.
+
+ii.	A Java map collection is used to store the word and its count to access later so that sum_per_document contains the proper value.
+
+iii. Using the map, the word(in map), the wordCount(in map) the document name(stored from i/p), and the docSize(computed as sum_per_document) are written in the right format to the next job using the context object  
+
+Note: Initially used a dictionary in java to save each word and its word count and access the word count using keys. However, upon research it was found to be an outdated approach as opposed to Java collection interface Map.
+
+Note: The values are still sent as Text flavours of Strings instead of actually computing and sending them. The compuation of tficf that requires wordCount/docSize.
+
+5. TFICFMapper:
+~~~~~~~~~~~~~~~
+The goal of this job (job_tfic in my implementation) is to compute the tficf value for each word with the computation formula given.
+
+i. The given input from the reducer of the previous job is Input:  ( (word@document) , (wordCount/docSize) ). This is converted to a string using the toString() method in java and then split using the split() method in java to get the word, document, wordCount, and docSize.
+
+ii. Java concat() method was used to produce the desired output that needs to be fed into the reducer phase. 
+
+6. TFICFReducer:
+~~~~~~~~~~~~~~~~
+The goal of this reducer is to get the number of documents, use the docSize and word counts and apply the formula to compute the tficf value for all the words.
+
+i. For each word which is the key from the mapper phase, the list of values with the document name, word count, and the docSize is given. From this, I found the number of documents that contain that word as it is required in calculating tficf. (eg. each word can appear a maximum of 3 times in the input0 directory since there are only 3 total documents. So the key is the word and the value is a list of document=wordCount/docSize is belongs to).
+
+ii. The document name and the wordCount/docSize are once again stored in a temporary map that will be used to access the same once the number of documents with words are completely calculated for that (key, value) pair.
+
+iii. For each word in the map which is the key, I got the document name and its wordCount/docSize which is still a string. By using the parseDouble method of java I have converted it from a string to apply the Math.log10 function of Java as mentioned in the formula.
+
+iv. Finally, the tficf value for each word@document is computed and stored in the tficfMap that sorts the (key, value) pairs and writes it to the file using the context object.
+
+All the jobs are created and executed and have methods such as setMapperClass, setReducerClass, setOutputKeyClass, SetValueClass, and the methods for getting the input and output path of the directories.
+
+Output Observations:
+~~~~~~~~~~~~~~~~~~~~
+There are minor differences from the sample output and I have accounted for the differences in the following observations.
+
+The regex pattern I have used to find a word is "[-a-zA-Z0-9À-ÿ_.?\'()]+"
+
+This pattern does not split words that have a hyphen splitting them and treats it as one word. This also considers all the words that contain any one of the characters mentioned in the pattern above. From my observation, I had found words that had special characters inbetween them (eg. who(se) in bruce-springsgteen.txt ). I have removed the special characters in between the words to convert them to be a legal word and have accounted for thier counts.
+
+In the sample output, words such as "injectedand"(in file it is: "injected, and"), "needneedneed"(in file it is: "need,need,need"), "sorrysorry"(in file it is: "sorry,sorry"), "andoh"(in file it is: "and, oh"), and "babyno"(in file it is: "baby, no") amongst others have been counted as legal words and tficf values had been calculated with them being considered. However, I have regarded them as separate legal words thereby varying my wordCount, docSize, and naturally the tficf value for each word from the given values in the sample output. 
+
+Since legal words have to be accounted for I have also considered words like "chorus", "incomprehensible" among others that come within the square brackets(eg. [chorus]) and taken the count for it. Hence, there was further variation of the values from the given sample outputs. 
+

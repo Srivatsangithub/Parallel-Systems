@@ -1,0 +1,65 @@
+Single Author Info:
+srames22 Srivatsan Ramesh
+
+The goal of the program is to compute the TF-ICF value of each word in the corpus of documents provided using Spark. 
+
+Implementation of the TF-ICF algorithm on Spark
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The skeleton contains a piece of code that reads in input from the corpus of files in "filesRDD" and sets up an initial job that will create JavaPairRDDs that contains word@document, docSize for every word from the corpus.
+
+TF Job
+~~~~~~~
+Mapping Phase:
+
+The TF job used the previous job's outputs as the input (word@document, docSize) and carries out basic string manipulation to rearrange the tuple to produce (word@document, 1/docSize). This mapping phase is carried out using the mapToPair transformation that produces pairRDD (key, value pairs). While this is similar to the map transformation in Java, Spark- it caters more to Java RDDs.
+
+Reduce Phase:
+
+Using the above transformation's output, where each word@document is now the key, the sum (Operation used in the reduceByKey transformation) of all the occurances is computed using Saprk's reduceByKey transformation which results in the wordCount of each word and the new tuple- (word@document, wordCount/docSize) is passed as input to the next job.
+
+ICF Job
+~~~~~~~
+Mapping Phase:
+
+mapToPair tranformation is used again since we are stil dealing with JavaRDD to do some basic string manupilation and preprocessing to hand over a viable input to the reduceByKey transformation of the ICF Job. The document name is removed from each "word@document" and the other part of the tuple is 1/document name.
+
+Reduce Phase:
+
+This phase used each word as the key to compute the total number of documents it occrured in and retured an output tuple as the following- (word, numDocsWithWord/document1, document2, ...). This is possible since each word was mapped to 1/document previously eg. (ipsum, 1/doc1), (ipsum, 1/doc2), ...
+Hence, after applying the summation operation we obtain the number of documents in which the word occurs. 
+
+Mapping Phase:
+
+Now for each key which would have several document names eg.: ipsum is present in doc1 and doc2, we want to map it to the corresponding document. Since each key will have multiple values, using flatMapToPair like transformations for pairRDD which essentially splits one RDD into multiple ones like we did in the initial jobs is ideal and produces the required results.	
+
+TF-ICF Job
+~~~~~~~
+
+Mapping Phases:
+
+There are two mapping phases, both using mapToPair transformation since we are still dealing with JavaRDD where each one get its respective input from the TF job and the ICF job. 
+The job that takes in the output of the TF job does computes the TF value for each word@document by using the given formula in the reference paper. (Used Math.log10() to compute log values).
+The job that takes in the output of the ICF job does computes the ICF value for each word@document by using the given formula in the reference paper. (Used Math.log10() to compute log values).
+
+This way each word@document will be mapped to the TF value as well as the ICF value which can be brought to one value in the reduction phase based on the operation used in the reduction phase. This is the reason we are using to mappers for the same word@document.
+
+Union Phase:
+
+Here, since we have two separate lists of data on which we are working with i.e tfFinalRDD and idfFinalRDD, to implement the reduce phase, the word@documents must be in one set of RDDs. Hence, union is used.
+
+Reduction Phase:
+
+After applying the union transformation, each word@document's tf and icf values are brought together and the multiplication operation is applied on them thereby giving us the TF-ICF values for each word.
+
+Mapping Phase:
+
+Post computing the TF-ICF value for each word@document, basic string manipulation is carried out to produce the required output i.e (document@word , TF-ICF Value).
+
+
+References:
+https://www.oreilly.com/library/view/apache-spark-2x/9781787126497/d0ae45f4-e8a1-4ea7-8036-606b7e27ddfd.xhtml
+
+https://sparkbyexamples.com/apache-spark-rdd/spark-reducebykey-usage-with-examples/
+
+https://www.javatpoint.com/apache-spark-union-function#:~:text=In%20Spark%2C%20Union%20function%20returns,present%20in%20the%20different%20datasets.
